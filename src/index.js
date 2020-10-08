@@ -1,23 +1,31 @@
 module.exports = function check(str, bracketsConfig) {
-  // your solution
-  var step = 0;
 
-  var arr = str.split('');
+      let closingBrackets = Object.assign(
+          {},
+          ...bracketsConfig.map(item => item[1])
+              .map(key => ({[key]: true}))),
 
-  for (var i = 0; i < arr.length; i++) {
-    if (arr[i] === '{' || arr[i] === '[' || arr[i] === '(') {
-      step++;
-    } else {
-      step--;
-    }
-    
-  }
+      openingBrackets = Object.assign(
+          {},
+          ...bracketsConfig.map(item => item[0])
+              .map((key, index) => {
+                  return ({[key]: Object.keys(closingBrackets)[index]})
+              })
+      ),
 
-  if (step === 0) {
-    return true;
-  } else {
-    return false;
-  }
+      stack = [];
 
+      for (let i = 0; i < str.length; i++) {
+          if (openingBrackets[str[i]]) {
+              if (openingBrackets[str[i]] && closingBrackets[str[i]] && stack[stack.length - 1] === str[i]) {
+                  stack.pop();
+              } else {
+                  stack.push(str[i]);
+              }
+          } else if (closingBrackets[str[i]]) {
+              if (openingBrackets[stack.pop()] !== str[i]) return false;
+          }
+      }
 
+      return stack.length === 0;
 }
